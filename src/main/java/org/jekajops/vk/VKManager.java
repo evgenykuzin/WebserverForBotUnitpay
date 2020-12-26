@@ -6,25 +6,20 @@ import com.vk.api.sdk.client.actors.GroupActor;
 import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.objects.docs.Doc;
-import com.vk.api.sdk.objects.messages.MessageAttachment;
 import com.vk.api.sdk.objects.photos.Photo;
 import com.vk.api.sdk.objects.photos.PhotoUpload;
 import com.vk.api.sdk.objects.photos.responses.WallUploadResponse;
 import com.vk.api.sdk.objects.users.UserXtrCounters;
 import com.vk.api.sdk.queries.docs.DocsGetMessagesUploadServerType;
 import com.vk.api.sdk.queries.messages.MessagesSendQuery;
-import org.jekajops.vk.buttons.Button;
-import org.jekajops.vk.buttons.KeyboardBuilder;
 import org.jekajops.core.database.Database;
 import org.jekajops.core.entities.Order;
-import org.jekajops.core.entities.Prank;
 import org.jekajops.core.utils.parsers.VkJsonParser;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class VKManager {
@@ -40,18 +35,15 @@ public class VKManager {
         }
     }
 
-    public void sendMessage(String msg, int peerId, KeyboardBuilder keyboard) {
+    public void sendMessage(String msg, int peerId) {
         if (msg == null) {
             System.out.println("message = null");
             return;
         }
         try {
             MessagesSendQuery msQuery = getSendQuery().peerId(peerId).message(msg);
-            if (keyboard != null) {
-                msQuery.unsafeParam("keyboard", keyboard.getJson());
-            }
             msQuery.executeAsRaw();
-            System.out.println("бот ответил " + VkJsonParser.getUserRealNameById(peerId) + ": " + msg);
+            System.out.println("бот ответил " + VkJsonParser.getUserRealNameById(peerId, vkCore) + ": " + msg);
         } catch (ClientException e) {
             e.printStackTrace();
         }
@@ -88,29 +80,6 @@ public class VKManager {
         return "doc" + doc.getOwnerId() + "_" + doc.getId();
     }
 
-    public void sendPrank(Prank prank, int peerId, boolean isAdmin) {
-        try {
-            if (prank == null) return;
-            String audioId = prank.getVkAudioId();
-            if (isAdmin) {
-                Button removeButton = new Button("удалить id:" + prank.getId(), Button.NEGATIVE);
-                KeyboardBuilder keyboardBuilder = prank.getKeyboardBuilder();
-                if (!keyboardBuilder.contains(removeButton)) {
-                    prank.getKeyboardBuilder()
-                            .addTextButton(removeButton, 1);
-                }
-            }
-            getSendQuery()
-                    .peerId(peerId)
-                    .message("Нажмите 'отправить id:" + prank.getId() + "', чтобы заказать этот пранк")
-                    .attachment(audioId)
-                    .unsafeParam("keyboard", prank.getKeyboardBuilder().getJson())
-                    .execute();
-
-        } catch (ClientException | ApiException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void sendCompletedOrder(Order order, File audioFile) {
         try {
@@ -197,7 +166,13 @@ public class VKManager {
 
     public boolean isSubscriber(int userId) {
         try {
-            return VKServer.vkCore.getVk().groups().getMembers(VKServer.vkCore.getGroupActor()).groupId(String.valueOf(VKCore.getGroupId())).execute().getItems().contains(userId);
+            return vkCore.getVk()
+                    .groups()
+                    .getMembers(vkCore.getGroupActor())
+                    .groupId(String.valueOf(VKCore.getGroupId()))
+                    .execute()
+                    .getItems()
+                    .contains(userId);
         } catch (ClientException | ApiException e) {
             e.printStackTrace();
         }

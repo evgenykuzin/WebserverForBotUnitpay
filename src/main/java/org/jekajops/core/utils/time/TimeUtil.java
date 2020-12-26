@@ -1,4 +1,4 @@
-package org.jekajops.call_api.call_managers.time;
+package org.jekajops.core.utils.time;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

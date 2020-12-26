@@ -1,17 +1,12 @@
-package org.jekajops.core.utils.payments;
+package org.jekajops.core.payments;
 
 import org.jekajops.core.http.headers.HeadersModel;
 import org.jekajops.core.http.headers.HeadersModelImpl;
 import org.jekajops.core.http.services.NetHttpService;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.TreeMap;
 
-import static org.jekajops.core.utils.payments.Utils.*;
+import static org.jekajops.core.payments.Utils.*;
 
 public class PaymentManager {
     private static final NetHttpService service;

@@ -1,18 +1,15 @@
 package org.jekajops.core.database;
 
-import org.jekajops.call_api.call_managers.time.TimeUtil;
 import org.jekajops.core.context.Context;
 import org.jekajops.core.database.wrappers.DatabaseCollectionWrapper;
 import org.jekajops.core.database.wrappers.DatabaseObjectWrapper;
 import org.jekajops.core.database.wrappers.DatabaseVoidWrapper;
-import org.jekajops.core.database.wrappers.DatabaseWrapper;
 import org.jekajops.core.entities.*;
 import org.eclipse.jetty.util.BlockingArrayQueue;
+import org.jekajops.core.utils.time.TimeUtil;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.jekajops.core.entities.User.Role.USER;
 
@@ -49,65 +46,6 @@ public class Database {
             ps.setString(1, url);
             ps.setString(2, vkAudioId);
             ps.executeUpdate();
-        }).execute();
-    }
-
-    private Prank constructPrank(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String cat = rs.getString("category");
-        String subcat = rs.getString("subcategory");
-        String text = rs.getString("text_msg");
-        String audioPath = rs.getString("vkaudio_id");
-        String audioId = rs.getString("audio_url");
-        int rating = rs.getInt("rating");
-        return new Prank(id, cat, subcat, text, audioPath, audioId, rating);
-    }
-
-    public Prank getPrankByDbId(int dbId) {
-        return ((DatabaseObjectWrapper<Prank>) () -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM pranks WHERE id = ?");
-            ps.setInt(1, dbId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return constructPrank(rs);
-            }
-            return null;
-        }).execute();
-    }
-
-    public List<Prank> getPranksByVkAudioId(String vkAudioId) {
-        return (List<Prank>) ((DatabaseCollectionWrapper<Prank>) () -> {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM pranks WHERE vkaudio_id = ?");
-            ps.setString(1, vkAudioId);
-            ResultSet rs = ps.executeQuery();
-            List<Prank> pranks = new ArrayList<>();
-            while (rs.next()) {
-                pranks.add(constructPrank(rs));
-            }
-            return pranks;
-        }).execute();
-    }
-
-    public List<Prank> getPranks(String category, String subcategory) {
-        return (List<Prank>) ((DatabaseCollectionWrapper<Prank>) () -> {
-            List<Prank> pranks = new ArrayList<>();
-            PreparedStatement ps;
-            if (category != null && subcategory == null) {
-                ps = connection.prepareStatement("SELECT * FROM pranks WHERE category = ?");
-                ps.setString(1, category);
-            } else if (category != null) {
-                ps = connection.prepareStatement("SELECT * FROM pranks WHERE (category, subcategory) = (?,?)");
-                ps.setString(1, category);
-                ps.setString(2, subcategory);
-            } else {
-                ps = connection.prepareStatement("SELECT * FROM pranks");
-            }
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                pranks.add(constructPrank(rs));
-            }
-            return pranks;
         }).execute();
     }
 
@@ -316,6 +254,7 @@ public class Database {
         ResultSet rs = statement.executeQuery();
         Queue<Order> orders = new BlockingArrayQueue<>();
         while (rs.next()) {
+
             long time = Objects.requireNonNullElse(rs.getTimestamp("start_time"), new Timestamp(0)).getTime() - 3 * TimeUtil.HOUR;
             orders.add(new Order(
                     rs.getInt("id"),

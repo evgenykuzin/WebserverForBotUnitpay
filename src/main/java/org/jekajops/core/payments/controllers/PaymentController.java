@@ -1,9 +1,10 @@
-package org.jekajops.core.utils.payments.controllers;
+package org.jekajops.core.payments.controllers;
 
 import com.google.gson.JsonObject;
+import org.jekajops.core.context.Context;
 import org.jekajops.core.database.Database;
 import org.jekajops.core.entities.User;
-import org.jekajops.core.utils.payments.Payment;
+import org.jekajops.core.payments.Payment;
 import org.jekajops.vk.VKManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.jekajops.core.utils.payments.Utils.getSignatureString;
-import static org.jekajops.core.utils.payments.Utils.projectSecretKey;
+import static org.jekajops.core.payments.Utils.getSignatureString;
+import static org.jekajops.core.payments.Utils.projectSecretKey;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -81,7 +82,7 @@ public class PaymentController {
                     User user = new Database().getUserByUserId(userId);
                     user.updatePayment(sum);
                     new VKManager().sendMessage("Баланс пополнен на "
-                            + sum + " руб.", userId, null);
+                            + sum + " руб.", userId);
                 }
             } catch (SQLException sqle) {
                 sqle.printStackTrace();
@@ -114,8 +115,8 @@ public class PaymentController {
             double orderSum = Double.parseDouble(payment.getOrderSum());
             double payerSum = Double.parseDouble(payment.getPayerSum());
 
-            int prankCost = 5;
-            if (orderSum < prankCost || orderSum != payerSum || orderSum == 0) {
+            int prankCost = Context.SETTINGS.PRANK_COST.getDATA();
+            if (orderSum < prankCost || payerSum < prankCost || orderSum != payerSum || orderSum == 0 || payerSum == 0) {
                 return getErrorJson("You enter a wrong cost! It is lower then prank cost (" + orderSum + " < " + prankCost + ").");
             }
         } catch (NumberFormatException | NullPointerException e) {
@@ -127,8 +128,9 @@ public class PaymentController {
         if (orderCurrency == null || !orderCurrency.equals(payerCurrency)) {
             return getErrorJson("wrong currency!");
         }
-        if (signature == null || !signature.equals(payment.getSignature()))
+        if (signature == null || !signature.equals(payment.getSignature())) {
             return getErrorJson("wrong signature");
+        }
         return getSuccessJson();
     }
 

@@ -1,15 +1,16 @@
 package org.jekajops.core.utils.files;
 
-import org.jekajops.App;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 public class FileManager {
     public static File download(String urlString, String fileName, String suffix) throws IOException {
@@ -45,9 +46,6 @@ public class FileManager {
         String projectPath = System.getProperty("user.dir");
         if (projectPath == null) {
             projectPath = new File("").getAbsolutePath();
-        }
-        if (projectPath.isEmpty()) {
-            projectPath = App.class.getResource("").toString();
         }
         File projectDir = new File(projectPath);
         File file = new File(projectDir.getAbsolutePath() + filePath);

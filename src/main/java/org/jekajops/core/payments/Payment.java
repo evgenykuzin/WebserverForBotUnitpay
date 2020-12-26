@@ -1,4 +1,4 @@
-package org.jekajops.core.utils.payments;
+package org.jekajops.core.payments;
 
 import java.util.HashMap;
 import java.util.Map;

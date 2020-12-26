@@ -1,4 +1,4 @@
-package org.jekajops.core.utils.payments;
+package org.jekajops.core.payments;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
