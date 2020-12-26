@@ -1,0 +1,1 @@
+web: java -jar $JAVA_OPTS -Dserver.port=$PORT --enable-preview target/WebserverForBotUnitpay-1.0-SNAPSHOT.jar
