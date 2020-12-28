@@ -28,17 +28,13 @@ public class PaymentController {
         System.out.println("FROM UNITPAY REQUEST: " + queryParameters);
         System.out.println("Payment: " + payment);
 
-        switch (payment.getMethod()) {
-            case Payment.PAY:
-                return pay(payment, signature);
-            case Payment.CHECK:
-                return check(payment, signature);
-            case Payment.ERROR:
-                return error(payment, signature);
-            case Payment.PREAUTH:
-                return preauth(payment, signature);
-        }
-        return getErrorJson("Wrong method name");
+        return switch (payment.getMethod()) {
+            case Payment.PAY -> pay(payment, signature);
+            case Payment.CHECK -> check(payment, signature);
+            case Payment.ERROR -> error(payment, signature);
+            case Payment.PREAUTH -> preauth(payment, signature);
+            default -> getErrorJson("Wrong method name");
+        };
     }
 
     @GetMapping("/pay")
@@ -116,7 +112,7 @@ public class PaymentController {
             double payerSum = Double.parseDouble(payment.getPayerSum());
 
             int prankCost = Context.SETTINGS.PRANK_COST.getDATA();
-            if (orderSum < prankCost || payerSum < prankCost || orderSum != payerSum || orderSum == 0 || payerSum == 0) {
+            if (orderSum < prankCost || payerSum < prankCost || orderSum == 0 || payerSum == 0) {
                 return getErrorJson("You enter a wrong cost! It is lower then prank cost (" + orderSum + " < " + prankCost + ").");
             }
         } catch (NumberFormatException | NullPointerException e) {
