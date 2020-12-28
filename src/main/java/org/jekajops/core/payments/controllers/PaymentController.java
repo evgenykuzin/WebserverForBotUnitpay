@@ -73,7 +73,7 @@ public class PaymentController {
             try {
                 String test = payment.getTest();
                 if (test != null && !test.equals("1")) {
-                    double sum = Double.parseDouble(payment.getPayerSum());
+                    double sum = Double.parseDouble(payment.getOrderSum());
                     int userId = Integer.parseInt(payment.getAccount());
                     User user = new Database().getUserByUserId(userId);
                     user.updatePayment(sum);
