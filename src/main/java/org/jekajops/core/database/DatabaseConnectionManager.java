@@ -32,8 +32,7 @@ public class DatabaseConnectionManager {
         if (connection == null) System.out.println("Connection is null!!!");
         return connection;
     }
-    public static Connection resetConnection(){
+    public static void resetConnection(){
         connection = initConnection(properties);
-        return connection;
     }
 }

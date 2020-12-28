@@ -91,18 +91,6 @@ public class PaymentController {
     }
 
     public ResponseEntity<String> check(Payment payment, String signature) {
-        try {
-            double orderSum = Double.parseDouble(payment.getOrderSum());
-            double payerSum = Double.parseDouble(payment.getPayerSum());
-
-            int prankCost = 5;
-            if (orderSum < prankCost || orderSum != payerSum) {
-                return getErrorJson("You enter a wrong cost! It is lower then prank cost (" + orderSum + " < " + prankCost + ").");
-            }
-        } catch (NumberFormatException | NullPointerException e) {
-            e.printStackTrace();
-            return getErrorJson("Missed 'sum' parameters.");
-        }
         return checkErrors(payment, signature);
     }
 
