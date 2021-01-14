@@ -7,10 +7,7 @@ import org.jekajops.payment_service.core.entities.User;
 import org.jekajops.payment_service.vk.VKManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -27,7 +24,7 @@ public class PaymentController2 {
     @GetMapping("/")
     public ResponseEntity<String> onRequest(@RequestParam Map<String, String> queryParameters) {
         String signature = getSignature(queryParameters);
-        System.out.println("FROM UNITPAY REQUEST: " + queryParameters);
+        System.out.println("FROM PAY REQUEST: " + queryParameters);
         return handle(queryParameters, signature);
     }
 

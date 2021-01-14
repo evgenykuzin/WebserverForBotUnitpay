@@ -3,10 +3,7 @@ package org.jekajops.payment_service.core.payments.controllers;
 import org.jekajops.payment_service.core.utils.files.FileManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("")
@@ -16,10 +13,10 @@ public class PageController {
         return "/index";
     }
 
-    @GetMapping("/wakemydyno.txt")
+    @RequestMapping(value = "/{file_name}", method = RequestMethod.GET)
     @ResponseBody
-    public FileSystemResource ping() {
-        return new FileSystemResource(FileManager.getFileFromResources("wakemydyno.txt"));
+    public FileSystemResource getFile(@PathVariable("file_name") String fileName) {
+        return new FileSystemResource(FileManager.getFileFromResources("/files/"+fileName));
     }
 
 }
