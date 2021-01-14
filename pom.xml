@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.jekajops</groupId>
-    <artifactId>WebserverForBotUnitpay</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.jekajops.payment_service</groupId>
+    <artifactId>WebserverForBotPayments</artifactId>
+    <version>1.1</version>
 
     <properties>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
@@ -69,7 +69,7 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
                     <configuration>
-                        <mainClass>org.jekajops.core.payments.PaymentApplication</mainClass>
+                        <mainClass>org.jekajops.payment_service.core.payments.PaymentApplication</mainClass>
                     </configuration>
                 </plugin>
                 <plugin>
