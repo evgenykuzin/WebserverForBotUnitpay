@@ -1,17 +1,11 @@
 package org.jekajops.payment_service.core.payments;
 
-import org.jekajops.payment_service.core.utils.files.PropertiesManager;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.Properties;
 
 public class Utils {
-    private static final Properties properties = PropertiesManager.getProperties("anypay");
-    public static final String PROJECT_SECRET_KEY = properties.getProperty("project.secret_key");
-    public static final String MERCHANT_ID = properties.getProperty("merchant_id");
 
     public static String getSignatureString(String secret_key, Collection<String> parameters, String delimiter) {
         final StringBuilder sb = new StringBuilder();

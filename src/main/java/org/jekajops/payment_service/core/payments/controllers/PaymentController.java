@@ -5,6 +5,7 @@ import org.jekajops.payment_service.core.context.Context;
 import org.jekajops.payment_service.core.database.Database;
 import org.jekajops.payment_service.core.entities.User;
 import org.jekajops.payment_service.core.entities.Payment;
+import org.jekajops.payment_service.core.utils.files.PropertiesManager;
 import org.jekajops.payment_service.vk.VKManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import static org.jekajops.payment_service.core.payments.Utils.*;
 @RequestMapping("/api/v1/")
 public class PaymentController {
     private Payment payment = new Payment();
+    private static final Properties properties = PropertiesManager.getProperties("unitpay");
+    public static final String PROJECT_SECRET_KEY = properties.getProperty("project.secret_key");
 
     @GetMapping("/")
     public ResponseEntity<String> onRequest(@RequestParam Map<String, String> queryParameters) {

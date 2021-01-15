@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import org.jekajops.payment_service.core.context.Context;
 import org.jekajops.payment_service.core.database.Database;
 import org.jekajops.payment_service.core.entities.User;
+import org.jekajops.payment_service.core.utils.files.PropertiesManager;
 import org.jekajops.payment_service.vk.VKManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +12,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import static org.jekajops.payment_service.core.payments.Utils.getSignatureString;
-import static org.jekajops.payment_service.core.payments.Utils.PROJECT_SECRET_KEY;
 
 @RestController
 @RequestMapping("/api/v2/")
 public class PaymentController2 {
+    private static final Properties properties = PropertiesManager.getProperties("anypay");
+    public static final String PROJECT_SECRET_KEY = properties.getProperty("project.secret_key");
+    public static final String MERCHANT_ID = properties.getProperty("merchant_id");
     static final String PAYER_CURRENCY = "RUB";
 
     @GetMapping("/")
@@ -48,21 +52,26 @@ public class PaymentController2 {
             return getErrorJson("Database error!");
         } catch (NumberFormatException nfe) {
             nfe.printStackTrace();
-            return getErrorJson("Sum or Account parameters error!");
+            return getErrorJson("Number format error");
         }
         return getSuccessJson();
     }
 
     private ResponseEntity<String> checkErrors(Map<String, String> payment, String signature){
         try {
-            double amount = Double.parseDouble(payment.get("amount"));
-            double profit = Double.parseDouble(payment.get("profit"));
-            System.out.println("profit = " + profit);
+            String amountParam = payment.get("amount");
+            if (amountParam == null) return getErrorJson("Missed 'amount' parameter.");
+            double amount = Double.parseDouble(amountParam);
+            String profitParam = payment.get("profit");
+            if (profitParam != null) {
+                double profit = Double.parseDouble(profitParam);
+                System.out.println("profit = " + profit);
+            }
             int prankCost = Context.SETTINGS.PRANK_COST.getDATA();
             if (amount < prankCost) {
                 return getErrorJson("You enter a wrong cost! It is lower then prank cost (" + amount + " < " + prankCost + ").");
             }
-        } catch (NumberFormatException | NullPointerException e) {
+        } catch (NumberFormatException e) {
             e.printStackTrace();
             return getErrorJson("Missed 'amount' parameter.");
         }
