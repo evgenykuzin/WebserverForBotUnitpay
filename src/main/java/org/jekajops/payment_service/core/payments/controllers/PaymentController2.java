@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
+import java.util.*;
 
 import static org.jekajops.payment_service.core.payments.Utils.getSignatureString;
 
@@ -27,14 +25,15 @@ public class PaymentController2 {
 
     @GetMapping("/")
     public ResponseEntity<String> onRequest(@RequestParam Map<String, String> queryParameters) {
+        String inputSignature = queryParameters.get("sign");
         String signature = getSignature(queryParameters);
         System.out.println("FROM PAY REQUEST: " + queryParameters);
-        return handle(queryParameters, signature);
+        return handle(queryParameters, signature, inputSignature);
     }
 
-    public ResponseEntity<String> handle(Map<String, String> payment, String signature) {
-        var checkErrors = checkErrors(payment, signature);
-        if (checkErrors.getStatusCode().isError()){
+    public ResponseEntity<String> handle(Map<String, String> payment, String signature, String inputSignature) {
+        var checkErrors = checkErrors(payment, signature, inputSignature);
+        if (checkErrors.getStatusCode().isError()) {
             return checkErrors;
         }
         try {
@@ -57,7 +56,7 @@ public class PaymentController2 {
         return getSuccessJson();
     }
 
-    private ResponseEntity<String> checkErrors(Map<String, String> payment, String signature){
+    private ResponseEntity<String> checkErrors(Map<String, String> payment, String signature, String inputSignature) {
         try {
             String amountParam = payment.get("amount");
             if (amountParam == null) return getErrorJson("Missed 'amount' parameter.");
@@ -81,7 +80,7 @@ public class PaymentController2 {
             return getErrorJson("wrong currency!");
         }
 
-        if (signature == null || !signature.equals(payment.get("sign"))) {
+        if (signature == null || !signature.equals(inputSignature)) {
             return getErrorJson("wrong signature");
         }
         return getSuccessJson();
@@ -112,9 +111,25 @@ public class PaymentController2 {
     }
 
     private static String getSignature(Map<String, String> queryParameters) {
-        Map<String, String> map = new TreeMap<>(queryParameters);
-        map.remove("sign");
-        return getSignatureString(PROJECT_SECRET_KEY, map.values(), ":");
+        var params = new ArrayList<String>();
+        params.add(MERCHANT_ID);
+        params.addAll(getParams(queryParameters, "amount", "pay_id"));
+        params.add(PROJECT_SECRET_KEY);
+        return getSignatureString(params, ":", "MD5");
+    }
+
+    private static String getParam(Map<String, String> queryParameters, String name) {
+        var param = queryParameters.get(name);
+        if (param == null) param = "";
+        return param;
+    }
+
+    private static List<String> getParams(Map<String, String> queryParameters, String... names) {
+        var params = new ArrayList<String>();
+        for (String name : names) {
+            params.add(getParam(queryParameters, name));
+        }
+        return params;
     }
 
 }

@@ -158,7 +158,9 @@ public class PaymentController {
         map.remove("params[signature]");
         map.remove("sign");
         map.remove("params[sign]");
-        return getSignatureString(PROJECT_SECRET_KEY, map.values(), "{up}");
+        var params = map.values();
+        params.add(PROJECT_SECRET_KEY);
+        return getSignatureString(params, "{up}", "SHA-256");
     }
 
 }

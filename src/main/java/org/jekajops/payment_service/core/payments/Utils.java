@@ -7,15 +7,18 @@ import java.util.Collection;
 
 public class Utils {
 
-    public static String getSignatureString(String secret_key, Collection<String> parameters, String delimiter) {
+    public static String getSignatureString(Collection<String> parameters, String delimiter, String hashMethodName) {
         final StringBuilder sb = new StringBuilder();
         parameters.forEach(v-> {
-            if (v != null) sb.append(v).append(delimiter);
+            if (v != null) {
+                sb.append(v).append(delimiter);
+            }
         });
-        sb.append(secret_key);
+        sb.replace(sb.length()-1, sb.length(), "");
+        System.out.println(sb.toString());
         MessageDigest digest;
         try {
-            digest = MessageDigest.getInstance("SHA-256");
+            digest = MessageDigest.getInstance(hashMethodName);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             return null;
