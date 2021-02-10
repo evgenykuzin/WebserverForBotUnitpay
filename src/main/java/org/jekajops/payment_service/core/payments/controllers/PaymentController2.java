@@ -36,11 +36,12 @@ public class PaymentController2 {
         if (checkErrors.getStatusCode().isError()) {
             return checkErrors;
         }
+        System.out.println(payment);
         try {
             String test = payment.get("test");
             if (test != null && !test.equals("1")) {
                 double amount = Double.parseDouble(payment.get("amount"));
-                int userId = Integer.parseInt(payment.get("user_id"));
+                int userId = Integer.parseInt(payment.get("pay_id"));
                 User user = new Database().getUserByUserId(userId);
                 user.updatePayment(amount);
                 new VKManager().sendMessage("Баланс пополнен на "

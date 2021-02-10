@@ -24,13 +24,10 @@ import java.util.logging.Logger;
 
 public class VKManager {
     public static VKCore vkCore;
-    private static Database database;
-    private static final Logger logger = Logger.getGlobal();
     static {
         try {
             vkCore = new VKCore();
-            database = new Database();
-        } catch (ApiException | ClientException | SQLException e) {
+        } catch (ApiException | ClientException e) {
             e.printStackTrace();
         }
     }
